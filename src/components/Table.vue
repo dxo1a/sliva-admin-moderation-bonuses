@@ -3,13 +3,12 @@ import { VSelect, VPagination, VTextField } from 'vuetify/components';
 import TableRow from './TableRow.vue';
 import BonusDialog from './BonusDialog.vue';
 
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useBonusesStore } from '@/stores/bonuses';
 
 const bonuses = useBonusesStore()
 
 const activeMenuId = ref<number | null>(null)
-
 function toggleMenu(id: number) {
     activeMenuId.value = activeMenuId.value === id ? null : id
 }
@@ -17,7 +16,6 @@ function toggleMenu(id: number) {
 const dialogVisible = ref(false)
 const dialogType = ref<'add' | 'remove' | 'adjust' | null>(null)
 const selectedRow = ref<any>(null)
-
 function openDialog(payload: {type: 'add' | 'remove' | 'adjust', row: any }) {
     dialogType.value = payload.type
     selectedRow.value = payload.row
@@ -34,7 +32,7 @@ const filteredData = computed(() => {
     }
 
     const q = searchQuery.value.toLowerCase()
-    const localMatches = bonuses.data.filter(row =>
+    const localMatches = bonuses.pagedData.filter((row: any) =>
         String(row.ID).includes(q) ||
         row.NAME.toLowerCase().includes(q) ||
         row.PHONE.toLowerCase().includes(q) ||
@@ -59,9 +57,7 @@ async function handleSearch() {
     // если локально пусто, то запрос на бэк (?)
     searching.value = true
     try {
-        const resp = await fetch(`/api/bonuses/search?q=${encodeURIComponent(searchQuery.value)}`)
-        if (!resp.ok) throw new Error('Ошибка поиска')
-        const data = await resp.json()
+        const data = bonuses.searchServer(searchQuery.value)
         searchResults.value = data
     } catch (e) {
         console.error(e)
@@ -71,8 +67,23 @@ async function handleSearch() {
     }
 }
 
+watch(
+    () => bonuses.fetchLimit,
+    (newLimit) => {
+        bonuses.currentPage = 1
+        bonuses.loadFakeData(1, newLimit)
+    }
+)
+
+watch(
+    () => bonuses.currentPage,
+    (newPage) => {
+        bonuses.loadFakeData(newPage, bonuses.fetchLimit)
+    }
+)
+
 onMounted(() => {
-    bonuses.loadFakeData()
+    bonuses.loadFakeData(1, bonuses.fetchLimit)
 })
 </script>
 
@@ -83,7 +94,7 @@ onMounted(() => {
                 <span style="height: fit-content">Элементов на странице:</span>
                 <VSelect
                     density="compact"
-                    v-model="bonuses.pageSize"
+                    v-model="bonuses.fetchLimit"
                     variant="solo-filled"
                     :items="[10, 20, 100, 500]"
                 >
@@ -100,7 +111,7 @@ onMounted(() => {
                 </button>
             </div>
 
-            <div v-if="bonuses.navSize > 1" class="adm-bonuses-control">
+            <div v-if="bonuses.navSize >= 1" class="adm-bonuses-control">
                 <VPagination total-visible="7" v-model="bonuses.currentPage" :length="bonuses.navSize"></VPagination>
             </div>
         </div>
@@ -143,6 +154,23 @@ onMounted(() => {
                 @toggleMenu="toggleMenu"
                 @openDialog="openDialog"
             />
+        </div>
+
+        <div class="adm-bonuses-controls">
+            <div class="adm-select-pagen">
+                <span style="height: fit-content">Элементов на странице:</span>
+                <VSelect
+                    density="compact"
+                    v-model="bonuses.fetchLimit"
+                    variant="solo-filled"
+                    :items="[10, 20, 100, 500]"
+                >
+                </VSelect>
+            </div>
+
+            <div v-if="bonuses.navSize >= 1" class="adm-bonuses-control">
+                <VPagination total-visible="7" v-model="bonuses.currentPage" :length="bonuses.navSize"></VPagination>
+            </div>
         </div>
     </div>
     <BonusDialog
