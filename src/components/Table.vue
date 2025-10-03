@@ -86,7 +86,7 @@ const tableLoading = ref(true)
 
 const wait = () => {
     return new Promise(resolve => {
-        return setTimeout(resolve, 3000) 
+        return setTimeout(resolve, 3000)
     })
 }
 await wait()
@@ -98,98 +98,101 @@ onMounted(() => {
 </script>
 
 <template>
-    <div v-if="!tableLoading">
-        <div class="adm-bonuses-controls">
-            <div class="adm-select-pagen">
-                <span style="height: fit-content">Элементов на странице:</span>
-                <VSelect
-                    density="compact"
-                    v-model="bonuses.fetchLimit"
-                    variant="solo-filled"
-                    :items="[10, 20, 100, 500]"
-                >
-                </VSelect>
-            </div>
+    <div>
 
-            <div class="relative">
-                <input @keyup.enter="handleSearch" v-model="searchQuery" class="min-w-[500px] min-h-[32px] border-[2px] border-[var(--blue)] pl-[6px]" placeholder="Поиск"/>
-                <button @click="handleSearch" class="w-[32px] h-[32px] absolute right-0 rounded-l-xl hover:bg-[var(--blue)] transition">
-                    <svg class="ml-[3px]" width="24" height="24" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12.1597 20.69C16.9811 20.69 20.8897 16.7814 20.8897 11.96C20.8897 7.13853 16.9811 3.22998 12.1597 3.22998C7.33824 3.22998 3.42969 7.13853 3.42969 11.96C3.42969 16.7814 7.33824 20.69 12.1597 20.69Z" stroke="black" stroke-width="2.3" stroke-miterlimit="10"></path>
-                        <path d="M17.9609 18.16L26.5809 26.77" stroke="black" stroke-width="2.3" stroke-miterlimit="10"></path>
-                    </svg>
-                </button>
-            </div>
+      <div v-if="!tableLoading">
+          <div class="adm-bonuses-controls">
+              <div class="adm-select-pagen">
+                  <span style="height: fit-content">Элементов на странице:</span>
+                  <VSelect
+                      density="compact"
+                      v-model="bonuses.fetchLimit"
+                      variant="solo-filled"
+                      :items="[10, 20, 100, 500]"
+                  >
+                  </VSelect>
+              </div>
 
-            <div v-if="bonuses.navSize >= 1" class="adm-bonuses-control">
-                <VPagination total-visible="7" v-model="bonuses.currentPage" :length="bonuses.navSize"></VPagination>
-            </div>
-        </div>
+              <div class="relative">
+                  <input @keyup.enter="handleSearch" v-model="searchQuery" class="min-w-[500px] min-h-[32px] border-[2px] border-[var(--blue)] pl-[6px]" placeholder="Поиск"/>
+                  <button @click="handleSearch" class="w-[32px] h-[32px] absolute right-0 rounded-l-xl hover:bg-[var(--blue)] transition">
+                      <svg class="ml-[3px]" width="24" height="24" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12.1597 20.69C16.9811 20.69 20.8897 16.7814 20.8897 11.96C20.8897 7.13853 16.9811 3.22998 12.1597 3.22998C7.33824 3.22998 3.42969 7.13853 3.42969 11.96C3.42969 16.7814 7.33824 20.69 12.1597 20.69Z" stroke="black" stroke-width="2.3" stroke-miterlimit="10"></path>
+                          <path d="M17.9609 18.16L26.5809 26.77" stroke="black" stroke-width="2.3" stroke-miterlimit="10"></path>
+                      </svg>
+                  </button>
+              </div>
 
-        <div class="adm-bonuses-moderation-table" role="table">
-            <div style="width: 100%" role="heading-cell" ></div>
-            <button
-                role="heading-cell"
-                :class="{ activeSort: bonuses.activeSort === 'ID', descSort: bonuses.isDesc, ascSort: !bonuses.isDesc }"
-                @click="bonuses.sort('ID')"
-            >
-                ID
-            </button>
-            <button
-                role="heading-cell"
-                :class="{ activeSort: bonuses.activeSort === 'NAME', descSort: bonuses.isDesc, ascSort: !bonuses.isDesc }"
-                @click="bonuses.sort('NAME')"
-            >
-                ФИО пользователя
-            </button>
-            <button
-                role="heading-cell"
-                :class="{ activeSort: bonuses.activeSort === 'PHONE', descSort: bonuses.isDesc, ascSort: !bonuses.isDesc }"
-                @click="bonuses.sort('PHONE')"
-            >
-                Телефон
-            </button>
-            <button
-                role="heading-cell"
-                :class="{ activeSort: bonuses.activeSort === 'BONUSES', descSort: bonuses.isDesc, ascSort: !bonuses.isDesc }"
-                @click="bonuses.sort('BONUSES')"
-            >
-                Бонусы
-            </button>
-            <TableRow
-                v-for="row in (searchResults.length ? searchResults : filteredData)"
-                :key="row.ID"
-                :rowData="row"
-                :menuActive="activeMenuId === row.ID"
-                @toggleMenu="toggleMenu"
-                @openDialog="openDialog"
-            />
-        </div>
+              <div v-if="bonuses.navSize >= 1" class="adm-bonuses-control">
+                  <VPagination total-visible="7" v-model="bonuses.currentPage" :length="bonuses.navSize"></VPagination>
+              </div>
+          </div>
 
-        <div class="adm-bonuses-controls">
-            <div class="adm-select-pagen">
-                <span style="height: fit-content">Элементов на странице:</span>
-                <VSelect
-                    density="compact"
-                    v-model="bonuses.fetchLimit"
-                    variant="solo-filled"
-                    :items="[10, 20, 100, 500]"
-                >
-                </VSelect>
-            </div>
+          <div class="adm-bonuses-moderation-table" role="table">
+              <div style="width: 100%" role="heading-cell" ></div>
+              <button
+                  role="heading-cell"
+                  :class="{ activeSort: bonuses.activeSort === 'ID', descSort: bonuses.isDesc, ascSort: !bonuses.isDesc }"
+                  @click="bonuses.sort('ID')"
+              >
+                  ID
+              </button>
+              <button
+                  role="heading-cell"
+                  :class="{ activeSort: bonuses.activeSort === 'NAME', descSort: bonuses.isDesc, ascSort: !bonuses.isDesc }"
+                  @click="bonuses.sort('NAME')"
+              >
+                  ФИО пользователя
+              </button>
+              <button
+                  role="heading-cell"
+                  :class="{ activeSort: bonuses.activeSort === 'PHONE', descSort: bonuses.isDesc, ascSort: !bonuses.isDesc }"
+                  @click="bonuses.sort('PHONE')"
+              >
+                  Телефон
+              </button>
+              <button
+                  role="heading-cell"
+                  :class="{ activeSort: bonuses.activeSort === 'BONUSES', descSort: bonuses.isDesc, ascSort: !bonuses.isDesc }"
+                  @click="bonuses.sort('BONUSES')"
+              >
+                  Бонусы
+              </button>
+              <TableRow
+                  v-for="row in (searchResults.length ? searchResults : filteredData)"
+                  :key="row.ID"
+                  :rowData="row"
+                  :menuActive="activeMenuId === row.ID"
+                  @toggleMenu="toggleMenu"
+                  @openDialog="openDialog"
+              />
+          </div>
 
-            <div v-if="bonuses.navSize >= 1" class="adm-bonuses-control">
-                <VPagination total-visible="7" v-model="bonuses.currentPage" :length="bonuses.navSize"></VPagination>
-            </div>
-        </div>
+          <div class="adm-bonuses-controls">
+              <div class="adm-select-pagen">
+                  <span style="height: fit-content">Элементов на странице:</span>
+                  <VSelect
+                      density="compact"
+                      v-model="bonuses.fetchLimit"
+                      variant="solo-filled"
+                      :items="[10, 20, 100, 500]"
+                  >
+                  </VSelect>
+              </div>
+
+              <div v-if="bonuses.navSize >= 1" class="adm-bonuses-control">
+                  <VPagination total-visible="7" v-model="bonuses.currentPage" :length="bonuses.navSize"></VPagination>
+              </div>
+          </div>
+      </div>
+
+      <BonusDialog
+          v-if="dialogVisible && dialogType"
+          v-model="dialogVisible"
+          :type="dialogType"
+          :waitrow="selectedRow"
+      />
     </div>
-
-    <BonusDialog
-        v-if="dialogVisible && dialogType"
-        v-model="dialogVisible"
-        :type="dialogType"
-        :row="selectedRow"
-    />
 </template>
 
 <style lang="css">
