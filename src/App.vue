@@ -1,26 +1,33 @@
 <script setup lang="ts">
-import Table from './components/Table.vue';
+import { ref, defineAsyncComponent } from 'vue'
+const Table = defineAsyncComponent(() => import('./components/Table.vue'))
 </script>
 
 <template>
-  <Transition name="loading">
+  <Transition name="fade" mode="out-in">
     <Suspense>
       <template #default>
-        <Table></Table>
+            <Table />
       </template>
-      <template #fallback> Загрузка </template>
+      <template #fallback>
+        <div class="loading-placeholder">Загрузка...</div>
+      </template>
     </Suspense>
   </Transition>
 </template>
 
+
 <style scoped>
-.loading-enter-active,
-.loading-leave-active {
-  transition: opacity 3500ms ease;
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 
-.loading-enter-from,
-.loading-leave-to {
-  opacity: 0;
+.loading-placeholder {
+  opacity: 0.5;
+  padding: 20px;
+  text-align: center;
 }
 </style>

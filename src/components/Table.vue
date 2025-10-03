@@ -82,13 +82,23 @@ watch(
     }
 )
 
+const tableLoading = ref(true)
+
+const wait = () => {
+    return new Promise(resolve => {
+        return setTimeout(resolve, 3000) 
+    })
+}
+await wait()
+
 onMounted(() => {
     bonuses.loadFakeData(1, bonuses.fetchLimit)
+    tableLoading.value = false
 })
 </script>
 
 <template>
-    <div>
+    <div v-if="!tableLoading">
         <div class="adm-bonuses-controls">
             <div class="adm-select-pagen">
                 <span style="height: fit-content">Элементов на странице:</span>
@@ -173,6 +183,7 @@ onMounted(() => {
             </div>
         </div>
     </div>
+
     <BonusDialog
         v-if="dialogVisible && dialogType"
         v-model="dialogVisible"
@@ -247,5 +258,12 @@ onMounted(() => {
 
 .adm-bonuses-moderation-table > [role='heading-cell'] {
     background-color: var(--blue);
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 </style>
