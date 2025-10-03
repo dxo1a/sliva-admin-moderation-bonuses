@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { ref, defineAsyncComponent } from 'vue'
-const Table = defineAsyncComponent(() => import('./components/Table.vue'))
+import Table from './components/Table.vue';
 </script>
 
 <template>
   <Transition name="fade" mode="out-in">
     <Suspense>
       <template #default>
-            <Table />
+        <Table />
       </template>
       <template #fallback>
         <div class="loading-placeholder">Загрузка...</div>
